@@ -1,9 +1,6 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { BRAND, INTRO, VALUES } from "../../data/about.js";
 import { IconChevron, IconCheck } from "../icons.jsx";
-
-/* photo shown in the polaroid (any image in /public) */
-const POLAROID_PHOTO = "/6.png";
 
 const MARQUEE = [
   "هويات بصرية",
@@ -53,7 +50,7 @@ function Chip({ pos, rotate, delay, tone, children }) {
       style={{ transform: "translate3d(calc(var(--px) * 1.8), calc(var(--py) * 1.8), 0)" }}
     >
       <div
-        className={`hx-float rounded-full px-5 py-2.5 text-sm font-bold whitespace-nowrap ${tones[tone]}`}
+        className={`hx-float rounded-full px-3 py-1.5 text-[11px] font-bold whitespace-nowrap sm:px-4 sm:py-2 sm:text-xs lg:px-5 lg:py-2.5 lg:text-sm ${tones[tone]}`}
         style={{ "--r": rotate, animationDelay: delay }}
       >
         {children}
@@ -104,7 +101,7 @@ export default function HeroSection() {
       <div className="hx-blob absolute -bottom-52 right-1/3 w-[30rem] h-[30rem] rounded-full bg-gild-bright/20 blur-[120px]" style={{ animationDelay: "-11s" }} />
 
       {/* lattice pattern + dark fade + burgundy orb (from the original hero) */}
-      <div className="absolute inset-0 lattice pointer-events-none" />
+      <div className="absolute inset-0 lattice opacity-75 lg:opacity-100 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/20 pointer-events-none" />
       <div className="absolute -left-24 top-1/2 -translate-y-1/2 w-[420px] h-[420px] rounded-full bg-oxblood/30 blur-[110px] pointer-events-none" />
 
@@ -121,14 +118,14 @@ export default function HeroSection() {
         src="/logo-mark-grey.svg"
         alt=""
         aria-hidden="true"
-        className="hidden md:block absolute -left-16 top-24 w-72 opacity-[.12] pointer-events-none"
+        className="absolute -left-8 top-28 w-40 opacity-[.06] pointer-events-none lg:-left-16 lg:top-24 lg:w-72 lg:opacity-[.12]"
       />
 
       {/* ---------- content ---------- */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-10 pt-32 pb-40">
-        <div className="grid md:grid-cols-12 gap-10 items-center">
+        <div className="grid lg:grid-cols-12 gap-10 items-center">
           {/* text (right side in RTL) */}
-          <div className="md:col-span-7 text-right">
+          <div className="lg:col-span-7 text-right">
             <div
               className="hx-up inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/[.07] backdrop-blur-md pl-5 pr-4 py-2 mb-8"
               style={up(50)}
@@ -212,15 +209,15 @@ export default function HeroSection() {
           </div>
 
           {/* logo scene (left side in RTL) */}
-          <div className="hx-up hidden md:block md:col-span-5 relative h-[560px]" style={up(400)}>
+          <div className="hx-up relative h-[390px] sm:h-[430px] md:h-[460px] lg:col-span-5 lg:h-[560px]" style={up(400)}>
             {/* polaroid stack */}
             <div
-              className="absolute inset-x-0 top-14 flex justify-center transition-transform duration-300 ease-out"
+              className="absolute inset-x-0 top-2 flex justify-end pr-5 transition-transform duration-300 ease-out sm:top-3 sm:justify-center sm:pr-0 lg:top-14"
               style={{ transform: "translate3d(var(--px), var(--py), 0)" }}
             >
-              <div className="hx-float relative w-[310px]" style={{ "--r": "0deg", animationDuration: "7s" }}>
+              <div className="hx-float relative w-[min(56vw,310px)] sm:w-[min(55vw,310px)] lg:w-[310px]" style={{ "--r": "0deg", animationDuration: "7s" }}>
                 {/* back polaroid: brand card */}
-                <div className="absolute inset-0 translate-x-12 translate-y-7 rotate-[8deg] bg-[#f4f2ef] p-3.5 pb-0 shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)]">
+                <div className="absolute inset-0 translate-x-6 translate-y-5 rotate-[8deg] bg-[#f4f2ef] p-2.5 pb-0 shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)] sm:translate-x-10 sm:p-3 lg:translate-x-12 lg:translate-y-7 lg:p-3.5">
                   <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-oxblood-soft via-oxblood to-oxblood-deep">
                     <div className="absolute top-0 left-0 w-20 h-20 bg-silver/60" style={{ clipPath: "polygon(0 0,100% 0,0 100%)" }} />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,.2),transparent_60%)]" />
@@ -234,9 +231,9 @@ export default function HeroSection() {
                 </div>
 
                 {/* front polaroid: photo */}
-                <div className="relative -rotate-[4deg] bg-[#fbfaf8] p-3.5 pb-0 shadow-[0_34px_70px_-20px_rgba(0,0,0,.8)] transition-transform duration-500 hover:-rotate-1 hover:scale-[1.02]">
+                <div className="relative -rotate-[4deg] bg-[#fbfaf8] p-2.5 pb-0 shadow-[0_34px_70px_-20px_rgba(0,0,0,.8)] transition-transform duration-500 hover:-rotate-1 hover:scale-[1.02] sm:p-3 lg:p-3.5">
                   {/* tape */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 rotate-[3deg] w-24 h-7 bg-silver-light/80 shadow-sm z-10" style={{ clipPath: "polygon(4% 0,96% 0,100% 20%,96% 40%,100% 60%,96% 80%,100% 100%,0 100%,4% 80%,0 60%,4% 40%,0 20%)" }} />
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-[3deg] w-16 h-5 bg-silver-light/80 shadow-sm z-10 sm:-top-4 sm:w-20 sm:h-6 lg:w-24 lg:h-7" style={{ clipPath: "polygon(4% 0,96% 0,100% 20%,96% 40%,100% 60%,96% 80%,100% 100%,0 100%,4% 80%,0 60%,4% 40%,0 20%)" }} />
 
                   <div className="relative aspect-square overflow-hidden bg-charcoal">
                     <img
@@ -255,23 +252,23 @@ export default function HeroSection() {
                     />
                   </div>
 
-                  <div className="h-[92px] flex flex-col items-center justify-center text-center">
-                    <p className="font-serif font-bold text-[1.7rem] leading-none text-oxblood">بوابتك للإبداع</p>
-                    <p className="text-[11px] text-silver mt-2 tracking-wide">باب أجياد ✦ تبوك</p>
+                  <div className="h-[72px] flex flex-col items-center justify-center text-center sm:h-[82px] lg:h-[92px]">
+                    <p className="font-serif font-bold text-xl leading-none text-oxblood lg:text-[1.7rem]">بوابتك للإبداع</p>
+                    <p className="text-[9px] text-silver mt-2 tracking-wide sm:text-[10px] lg:text-[11px]">باب أجياد ✦ تبوك</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* stickers */}
-            <Chip pos="top-0 -right-3" rotate="-7deg" delay="0s" tone="light">تصميم ✦</Chip>
-            <Chip pos="top-[38%] -left-2" rotate="6deg" delay="-1.5s" tone="glass">طباعة</Chip>
-            <Chip pos="bottom-28 right-0" rotate="5deg" delay="-3s" tone="red">حروف بارزة</Chip>
-            <Chip pos="bottom-2 left-8" rotate="-4deg" delay="-4.5s" tone="glass">ويب وسوشيال</Chip>
+            <Chip pos="top-1 right-2 sm:top-0 sm:right-4 lg:top-0 lg:right-[-0.75rem]" rotate="-7deg" delay="0s" tone="light">تصميم ✦</Chip>
+            <Chip pos="top-[38%] right-0 sm:left-4 sm:right-auto lg:left-[-0.5rem]" rotate="6deg" delay="-1.5s" tone="glass">طباعة</Chip>
+            <Chip pos="bottom-28 right-1 sm:right-4 lg:right-0" rotate="5deg" delay="-3s" tone="red">حروف بارزة</Chip>
+            <Chip pos="bottom-2 right-0 sm:bottom-2 sm:left-8 sm:right-auto lg:left-8" rotate="-4deg" delay="-4.5s" tone="glass">ويب وسوشيال</Chip>
 
             {/* mini glass note */}
             <div
-              className="absolute bottom-16 left-0 transition-transform duration-300 ease-out"
+              className="hidden lg:block absolute bottom-16 left-0 transition-transform duration-300 ease-out"
               style={{ transform: "translate3d(calc(var(--px) * 1.3), calc(var(--py) * 1.3), 0)" }}
             >
               <div className="flex items-center gap-3 rounded-2xl border border-white/25 bg-ink/60 backdrop-blur-md px-4 py-3 shadow-xl">

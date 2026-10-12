@@ -1,5 +1,3 @@
-import { IconPalette, IconPrinter, IconBillboard, IconGlobe } from "../components/icons.jsx";
-
 // Content source: section 6 of the company profile ("خدماتنا وأقسامنا").
 // NOTE: the profile numbers the sections أولاً، ثانياً، ثالثاً، ثم خامساً —
 // the fourth (رابعاً) section is missing from the document, so it is not
@@ -8,7 +6,6 @@ export const SERVICES_INTRO = "نقدم باقة متكاملة من الحلو�
 
 export const SERVICES = [
   {
-    icon: IconPalette,
     title: "قسم التصميم الإبداعي",
     body: "هنا يبدأ كل شيء. فريقنا من المصممين المحترفين يحول الأفكار المجردة إلى لغة بصرية مؤثرة.",
     items: [
@@ -19,7 +16,6 @@ export const SERVICES = [
     ],
   },
   {
-    icon: IconPrinter,
     title: "خدمات الطباعة",
     body: "نحول التصاميم الرقمية إلى منتجات ملموسة بألوان تنبض بالحياة.",
     items: [
@@ -30,7 +26,6 @@ export const SERVICES = [
     ],
   },
   {
-    icon: IconBillboard,
     title: "فنون الإضاءة والإشارات والحروف البارزة",
     body: "نمنح علامتك التجارية الظهور الذي لا يمكن تجاهله، ليلاً ونهاراً.",
     items: [
@@ -41,7 +36,6 @@ export const SERVICES = [
     ],
   },
   {
-    icon: IconGlobe,
     title: "خدمات إدارة المحتوى وتطبيقات الإنترنت",
     body: "صوتك الرقمي الذي يصل للعالم.",
     items: [

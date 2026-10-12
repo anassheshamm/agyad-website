@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { fetchProjects } from "../../services/api.js";
+import { fetchProjects, resolveImageUrl } from "../../services/api.js";
 
 // Unified filters based on your project categories
 const FILTERS = [
@@ -41,7 +41,7 @@ export default function GallerySection() {
       id: p.slug || p._id,
       title: p.title,
       cat: p.category,
-      image: displayImage,
+      image: resolveImageUrl(displayImage),
       size: index % 5 === 0 ? "tall" : index % 3 === 0 ? "wide" : "normal"
     };
   });
@@ -92,6 +92,7 @@ export default function GallerySection() {
                   src={g.image}
                   alt={g.title}
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  onError={(e) => { e.currentTarget.style.display = "none"; }}
                 />
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/60 transition-colors duration-500" />
                 <div className="absolute inset-x-0 bottom-0 p-5 text-right opacity-90 group-hover:opacity-100 transition-opacity">

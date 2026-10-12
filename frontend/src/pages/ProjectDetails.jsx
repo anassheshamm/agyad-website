@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { fetchProjectById } from "../services/api.js";
+import { fetchProjectById, resolveImageUrl } from "../services/api.js";
 import { IconChevron, IconShare, IconSend, IconCheck } from "../components/icons.jsx";
 
 function InfoTable({ rows }) {
@@ -73,6 +73,7 @@ export default function ProjectDetail() {
     { label: "القنوات", value: project.clientInfo.channels },
     { label: "الهدف الرئيسي", value: project.clientInfo.mainObjective },
   ].filter(r => r.value) : [];
+  const galleryImages = [...new Set([project.coverImage, ...(project.images || [])].filter(Boolean))];
 
   return (
     <div dir="rtl" lang="ar" className="bg-gray-50 min-h-screen font-sans text-gray-900">
@@ -121,11 +122,11 @@ export default function ProjectDetail() {
             <video src={project.videoUrl} controls className="w-full rounded-xl mb-6" />
           )}
 
-          {project.images && project.images.length > 0 && (
+          {galleryImages.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {project.images.map((img, i) => (
+              {galleryImages.map((img, i) => (
                 <div key={i} className="aspect-[4/3] bg-gray-100 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-                  <img src={img} alt={`${project.title} - ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                  <img src={resolveImageUrl(img)} alt={`${project.title} - ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 </div>
               ))}
             </div>

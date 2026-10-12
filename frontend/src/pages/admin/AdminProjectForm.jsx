@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { fetchProjectById, createProject, updateProject } from "../../services/api";
+import { fetchProjectById, createProject, updateProject, uploadProjectImages, resolveImageUrl } from "../../services/api";
 import { IconChevron, IconCheck } from "../../components/icons.jsx";
 
 const CATEGORIES = [
@@ -16,13 +16,10 @@ const EMPTY_CLIENT = {
   launchWindow: "", duration: "", channels: "", mainObjective: "",
 };
 const EMPTY = {
-  slug: "", title: "", subtitle: "", category: "", year: new Date().getFullYear(),
+  title: "", subtitle: "", category: "", year: new Date().getFullYear(),
   isFeatured: false, description: "", icon: "billboard", videoPlaceholder: "", videoUrl: "",
-  overview: "", story: "", images: [], results: [], deliverables: [], clientInfo: EMPTY_CLIENT,
+  overview: "", story: "", coverImage: "", images: [], results: [], deliverables: [], clientInfo: EMPTY_CLIENT,
 };
-
-const slugify = (s) =>
-  s.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
 
 // Looks like plain text until hovered/focused — so the page reads like the public one.
 const ghost =
@@ -90,8 +87,11 @@ export default function AdminProjectForm() {
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [slugTouched, setSlugTouched] = useState(isEditing);
   const [toast, setToast] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [coverPreview, setCoverPreview] = useState("");
+  const previewUrls = useRef(new Set());
 
   const notify = (type, msg) => {
     setToast({ type, msg });
@@ -104,16 +104,21 @@ export default function AdminProjectForm() {
   }, []);
   const updateClient = (key, value) => update({ clientInfo: { ...form.clientInfo, [key]: value } });
 
+  useEffect(() => () => previewUrls.current.forEach((preview) => URL.revokeObjectURL(preview)), []);
+
   useEffect(() => {
     if (!isEditing) return;
     (async () => {
       const d = await fetchProjectById(id);
       if (d) {
+        const projectData = { ...d };
+        delete projectData.slug;
         setForm({
-          ...EMPTY, ...d,
+          ...EMPTY, ...projectData,
           year: d.year || EMPTY.year,
           isFeatured: Boolean(d.isFeatured),
           icon: d.icon || "billboard",
+          coverImage: d.coverImage || "",
           images: d.images || [], results: d.results || [], deliverables: d.deliverables || [],
           clientInfo: { ...EMPTY_CLIENT, ...(d.clientInfo || {}) },
         });
@@ -131,20 +136,71 @@ export default function AdminProjectForm() {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
-  const onTitle = (title) => update({ title, ...(slugTouched ? {} : { slug: slugify(title) }) });
+  const onTitle = (title) => update({ title });
+
+  const allowedImage = (file) => /image\/(jpeg|png|webp)/.test(file.type) && file.size <= 2 * 1024 * 1024;
+  const makePreview = (file) => {
+    const preview = URL.createObjectURL(file);
+    previewUrls.current.add(preview);
+    return preview;
+  };
+  const removePreview = (preview) => {
+    if (preview) {
+      URL.revokeObjectURL(preview);
+      previewUrls.current.delete(preview);
+    }
+  };
+  const projectImageCount = (coverPending = coverFile, galleryPending = imageFiles) => new Set([
+    ...(coverPending ? [] : [form.coverImage]), ...form.images,
+    ...(coverPending ? ["pending-cover"] : []), ...galleryPending.map((_file, i) => `pending-image-${i}`),
+  ].filter(Boolean)).size;
+
+  const selectCover = (file) => {
+    if (!file) return;
+    if (!allowedImage(file)) return notify("error", "اختر صورة JPG أو PNG أو WebP بحجم لا يتجاوز 2 MB");
+    if (projectImageCount(file, imageFiles) > 10) return notify("error", "الحد الأقصى 10 صور للمشروع، بما فيها صورة الغلاف");
+    removePreview(coverPreview);
+    setCoverFile(file);
+    setCoverPreview(makePreview(file));
+    update({});
+  };
+
+  const selectImages = (files) => {
+    const selected = Array.from(files || []);
+    if (selected.some((file) => !allowedImage(file))) return notify("error", "اختر صور JPG أو PNG أو WebP بحجم لا يتجاوز 2 MB لكل صورة");
+    const next = [...imageFiles, ...selected];
+    if (projectImageCount(coverFile, next) > 10) return notify("error", "الحد الأقصى 10 صور للمشروع، بما فيها صورة الغلاف");
+    setImageFiles([...imageFiles, ...selected.map((file) => ({ file, preview: makePreview(file) }))]);
+    update({});
+  };
 
   const save = async (e) => {
     e?.preventDefault();
     if (!form.title.trim()) return notify("error", "اكتب عنوان المشروع أولاً");
     if (!form.category) return notify("error", "اختر تصنيف المشروع من الإعدادات");
-    const clean = (arr) => arr.map((x) => x.trim()).filter(Boolean);
-    const payload = {
-      ...form,
-      slug: form.slug.trim() || slugify(form.title),
-      images: clean(form.images), results: clean(form.results), deliverables: clean(form.deliverables),
-    };
+    if (projectImageCount() > 10) return notify("error", "الحد الأقصى 10 صور للمشروع، بما فيها صورة الغلاف");
     setSaving(true);
     try {
+      let coverImage = form.coverImage;
+      let addedImages = [];
+      const pendingFiles = [...(coverFile ? [coverFile] : []), ...imageFiles.map(({ file }) => file)];
+      if (pendingFiles.length) {
+        const uploaded = await uploadProjectImages(pendingFiles);
+        if (!uploaded.success) return notify("error", uploaded.message || "تعذر رفع الصور");
+        const urls = uploaded.data?.images;
+        if (!Array.isArray(urls) || urls.length !== pendingFiles.length || urls.some((url) => typeof url !== "string" || !url)) {
+          return notify("error", "استجاب الخادم بروابط صور غير مكتملة، حاول رفع الصور مرة أخرى");
+        }
+        if (coverFile) coverImage = urls.shift();
+        addedImages = urls;
+      }
+      const clean = (arr) => arr.map((x) => x.trim()).filter(Boolean);
+      const images = [...new Set([...clean(form.images), ...addedImages])];
+      if (new Set([coverImage, ...images].filter(Boolean)).size > 10) return notify("error", "الحد الأقصى 10 صور للمشروع، بما فيها صورة الغلاف");
+      const payload = {
+        ...form, coverImage,
+        images, results: clean(form.results), deliverables: clean(form.deliverables),
+      };
       const res = isEditing ? await updateProject(id, payload) : await createProject(payload);
       if (res.success) {
         setDirty(false);
@@ -221,12 +277,30 @@ export default function AdminProjectForm() {
           <input value={form.videoUrl} onChange={(e) => update({ videoUrl: e.target.value })} placeholder="https://.../video.mp4" dir="ltr" className={`${ghost} text-sm mb-2`} />
           {form.videoUrl && <video src={form.videoUrl} controls className="w-full rounded-xl mb-6" />}
 
-          <p className="text-xs text-gray-500 mt-4 mb-3">الصور</p>
+          <div className="mb-5">
+            <p className="text-xs text-gray-500 mb-2">صورة الغلاف</p>
+            <div className="flex flex-wrap items-start gap-4">
+              {(coverPreview || form.coverImage) && <div className="relative w-48 aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                <img src={coverPreview || resolveImageUrl(form.coverImage)} alt="معاينة الغلاف" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.opacity = 0.15)} />
+                <button type="button" onClick={() => {
+                  removePreview(coverPreview);
+                  setCoverPreview("");
+                  setCoverFile(null);
+                  if (!coverFile) update({ coverImage: "" });
+                }} aria-label="حذف صورة الغلاف" className="absolute top-2 left-2 w-7 h-7 rounded-full bg-white/90 text-gray-600 hover:text-red-700 shadow">×</button>
+              </div>}
+              <label className="w-48 aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 text-gray-500 hover:border-red-400 hover:text-red-700 transition-colors flex flex-col items-center justify-center gap-1 text-sm cursor-pointer">
+                <span className="text-2xl leading-none">+</span> اختيار صورة الغلاف
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { selectCover(e.target.files?.[0]); e.target.value = ""; }} />
+              </label>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-4 mb-3">صور إضافية ({new Set([form.coverImage, ...form.images, ...(coverFile ? ["pending-cover"] : []), ...imageFiles.map((_file, i) => `pending-${i}`)].filter(Boolean)).size}/10)</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {form.images.map((img, i) => (
               <div key={i} className="border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
                 <div className="relative aspect-[4/3] bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                  {img ? <img src={img} alt="" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.opacity = 0.15)} /> : "ألصق رابط الصورة بالأسفل"}
+                  {img ? <img src={resolveImageUrl(img)} alt="" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.opacity = 0.15)} /> : "ألصق رابط الصورة بالأسفل"}
                   <button type="button" onClick={() => update({ images: form.images.filter((_, x) => x !== i) })} aria-label="حذف الصورة" className="absolute top-2 left-2 w-7 h-7 rounded-full bg-white/90 text-gray-600 hover:text-red-700 shadow">×</button>
                 </div>
                 <input
@@ -238,9 +312,14 @@ export default function AdminProjectForm() {
                 />
               </div>
             ))}
-            <button type="button" onClick={() => update({ images: [...form.images, ""] })} className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 text-gray-500 hover:border-red-400 hover:text-red-700 transition-colors flex flex-col items-center justify-center gap-1 text-sm">
-              <span className="text-2xl leading-none">+</span> إضافة صورة
-            </button>
+            {imageFiles.map(({ file, preview }, i) => <div key={`${file.name}-${i}`} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-gray-200 bg-gray-100">
+              <img src={preview} alt={file.name} className="w-full h-full object-cover" />
+              <button type="button" onClick={() => { removePreview(preview); setImageFiles(imageFiles.filter((_item, index) => index !== i)); update({}); }} aria-label="حذف الصورة المحددة" className="absolute top-2 left-2 w-7 h-7 rounded-full bg-white/90 text-gray-600 hover:text-red-700 shadow">×</button>
+            </div>)}
+            <label className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-300 text-gray-500 hover:border-red-400 hover:text-red-700 transition-colors flex flex-col items-center justify-center gap-1 text-sm cursor-pointer">
+              <span className="text-2xl leading-none">+</span> اختيار صور إضافية
+              <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only" onChange={(e) => { selectImages(e.target.files); e.target.value = ""; }} />
+            </label>
           </div>
         </Card>
 
@@ -300,16 +379,6 @@ export default function AdminProjectForm() {
               <label className="block text-xs text-gray-500">
                 وصف قصير يظهر في بطاقة المشروع
                 <textarea value={form.description} onChange={(e) => update({ description: e.target.value })} rows={3} className="mt-1 w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-600" />
-              </label>
-
-              <label className="block text-xs text-gray-500">
-                الرابط الدائم
-                <input
-                  value={form.slug} dir="ltr"
-                  onChange={(e) => { setSlugTouched(true); update({ slug: e.target.value }); }}
-                  className="mt-1 w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-600"
-                />
-                {!slugTouched && <span className="block mt-1 text-[11px] text-gray-400">يُكتب تلقائياً من العنوان</span>}
               </label>
 
               <label className="flex items-start gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 cursor-pointer">
