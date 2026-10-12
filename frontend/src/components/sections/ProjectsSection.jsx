@@ -10,7 +10,7 @@ export default function ProjectsSection() {
 
   useEffect(() => {
     const loadProjects = async () => {
-      const data = await fetchProjects();
+      const data = await fetchProjects(true);
       setProjects(data);
       setLoading(false);
     };

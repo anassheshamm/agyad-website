@@ -121,7 +121,7 @@ export default function HeroSection() {
         src="/logo-mark-grey.svg"
         alt=""
         aria-hidden="true"
-        className="md:hidden absolute -left-16 top-24 w-72 opacity-[.12] pointer-events-none"
+        className="hidden md:block absolute -left-16 top-24 w-72 opacity-[.12] pointer-events-none"
       />
 
       {/* ---------- content ---------- */}
@@ -225,10 +225,10 @@ export default function HeroSection() {
                     <div className="absolute top-0 left-0 w-20 h-20 bg-silver/60" style={{ clipPath: "polygon(0 0,100% 0,0 100%)" }} />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,.2),transparent_60%)]" />
                     <img
-                      src="/download1.png"
+                      src="/logo-new.png"
                       alt=""
                       aria-hidden="true"
-                      className="absolute inset-0 m-auto w-[62%] brightness-125 drop-shadow-[0_10px_18px_rgba(0,0,0,.4)]"
+                      className="absolute inset-0 m-auto w-[84%] drop-shadow-[0_10px_18px_rgba(0,0,0,.4)]"
                     />
                   </div>
                 </div>

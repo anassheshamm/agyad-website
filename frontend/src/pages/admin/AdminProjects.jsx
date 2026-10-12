@@ -1,73 +1,155 @@
-import React, { useState, useEffect } from "react";
-import { fetchProjects, deleteProject } from "../../services/api";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { fetchProjects, deleteProject } from "../../services/api";
 
 export default function AdminProjects() {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("الكل");
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadProjects();
+    (async () => {
+      const data = await fetchProjects();
+      setProjects(Array.isArray(data) ? data : []);
+      setLoading(false);
+    })();
   }, []);
 
-  const loadProjects = async () => {
-    const data = await fetchProjects();
-    setProjects(data);
+  const notify = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this project?")) {
-      const res = await deleteProject(id);
-      if (res.success) {
-        setProjects(projects.filter((p) => p._id !== id));
-      } else {
-        alert("Failed to delete project");
-      }
+  const categories = useMemo(
+    () => ["الكل", ...new Set(projects.map((p) => p.category).filter(Boolean))],
+    [projects]
+  );
+
+  const shown = projects.filter(
+    (p) =>
+      (category === "الكل" || p.category === category) &&
+      (p.title || "").toLowerCase().includes(query.trim().toLowerCase())
+  );
+
+  const handleDelete = async (project) => {
+    if (!window.confirm(`هل أنت متأكد من حذف «${project.title}»؟ لا يمكن التراجع عن ذلك.`)) return;
+    const res = await deleteProject(project._id);
+    if (res.success) {
+      setProjects((list) => list.filter((p) => p._id !== project._id));
+      notify("تم حذف المشروع");
+    } else {
+      notify(res.message || "تعذر حذف المشروع");
     }
   };
 
-  const handleLogout = () => {
+  const logout = () => {
     localStorage.removeItem("adminToken");
     navigate("/admin/login");
   };
 
+  const featured = projects.filter((p) => p.isFeatured).length;
+
   return (
-    <div className="min-h-screen bg-[#F3F3F4] p-8 font-sans" dir="rtl">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#8e1b31]">إدارة المشاريع</h1>
-          <div className="flex gap-4">
-            <Link to="/admin/projects/new" className="bg-[#b3223f] text-white px-6 py-2 rounded-lg">إضافة مشروع جديد</Link>
-            <button onClick={handleLogout} className="bg-[#2b2b2e] text-white px-6 py-2 rounded-lg">تسجيل الخروج</button>
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900" dir="rtl" lang="ar">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-4 flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-xl font-bold text-red-700">لوحة الإدارة</h1>
+          <nav className="flex flex-wrap items-center gap-3">
+            <Link to="/admin/services" className="text-sm font-medium text-gray-700 border border-gray-200 px-5 py-2.5 rounded-lg hover:border-red-300 hover:text-red-700 transition-colors">
+              إدارة الخدمات
+            </Link>
+            <Link to="/admin/projects/new" className="text-sm font-medium bg-red-700 text-white px-5 py-2.5 rounded-lg hover:bg-red-800 transition-colors shadow-sm">
+              + مشروع جديد
+            </Link>
+            <button onClick={logout} className="text-sm text-gray-500 hover:text-red-700 px-2">تسجيل الخروج</button>
+          </nav>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 md:px-10 py-10">
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-3xl font-semibold tracking-tight">المشاريع</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {projects.length} مشروع، منها {featured} ظاهر في الصفحة الرئيسية
+            </p>
           </div>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ابحث باسم المشروع..."
+            className="w-full sm:w-72 bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-red-600"
+          />
         </div>
 
-        <div className="bg-white rounded-xl shadow overflow-hidden">
-          <table className="w-full text-right">
-            <thead className="bg-[#e6e6e8] border-b">
-              <tr>
-                <th className="p-4 font-semibold text-[#2b2b2e]">العنوان</th>
-                <th className="p-4 font-semibold text-[#2b2b2e]">التصنيف</th>
-                <th className="p-4 font-semibold text-[#2b2b2e]">السنة</th>
-                <th className="p-4 font-semibold text-[#2b2b2e]">الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#e6e6e8]">
-              {projects.map((project) => (
-                <tr key={project._id} className="hover:bg-[#f3f3f4]">
-                  <td className="p-4">{project.title}</td>
-                  <td className="p-4">{project.category}</td>
-                  <td className="p-4">{project.year}</td>
-                  <td className="p-4 flex gap-4">
-                    <Link to={`/admin/projects/edit/${project._id}`} className="text-blue-600 hover:underline">تعديل</Link>
-                    <button onClick={() => handleDelete(project._id)} className="text-[#b3223f] hover:underline">حذف</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="flex flex-wrap gap-2 mb-8">
+          {categories.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCategory(c)}
+              className={"px-4 py-1.5 rounded-full border text-sm transition-colors " + (category === c ? "bg-red-700 border-red-700 text-white" : "bg-white border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-700")}
+            >
+              {c}
+            </button>
+          ))}
         </div>
-      </div>
+
+        {loading ? (
+          <p className="text-center text-red-700 py-20">جاري التحميل...</p>
+        ) : shown.length === 0 ? (
+          <div className="bg-white border border-dashed border-gray-300 rounded-2xl py-16 text-center">
+            <p className="text-gray-700 font-medium mb-1">
+              {projects.length === 0 ? "لا توجد مشاريع بعد" : "لا توجد نتائج مطابقة"}
+            </p>
+            <p className="text-sm text-gray-500 mb-6">
+              {projects.length === 0 ? "ابدأ بإضافة أول مشروع ليظهر في الموقع." : "جرّب كلمة بحث أو تصنيفاً آخر."}
+            </p>
+            {projects.length === 0 && (
+              <Link to="/admin/projects/new" className="inline-block bg-red-700 text-white text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-red-800">
+                إضافة مشروع
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {shown.map((p) => (
+              <article key={p._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
+                <Link to={`/admin/projects/edit/${p._id}`} className="block aspect-[16/10] bg-gray-100 relative">
+                  {p.images?.[0] ? (
+                    <img src={p.images[0]} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="absolute inset-0 flex items-center justify-center text-xs text-gray-400">بدون صورة</span>
+                  )}
+                  {p.isFeatured && (
+                    <span className="absolute top-3 right-3 bg-red-700 text-white text-xs px-3 py-1 rounded-full">في الرئيسية</span>
+                  )}
+                </Link>
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="font-semibold text-lg leading-snug">{p.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1 mb-4">{[p.category, p.year].filter(Boolean).join(" • ")}</p>
+                  <div className="mt-auto flex items-center justify-between">
+                    <Link to={`/admin/projects/edit/${p._id}`} className="text-sm font-medium bg-gray-900 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                      تعديل
+                    </Link>
+                    <button onClick={() => handleDelete(p)} className="text-sm text-gray-400 hover:text-red-700 transition-colors">
+                      حذف
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {toast && (
+        <div role="status" className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-6 py-3 rounded-lg shadow-lg">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

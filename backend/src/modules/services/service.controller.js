@@ -9,6 +9,13 @@ export async function list(_req, res, next) {
     return next(e);
   }
 }
+export async function listAll(_req, res, next) {
+  try {
+    return send(res, await service.listAll());
+  } catch (e) {
+    return next(e);
+  }
+}
 export async function get(req, res, next) {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: "Invalid ID" });

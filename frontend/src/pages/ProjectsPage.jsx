@@ -85,7 +85,9 @@ export default function ProjectsPage() {
         
         setData({
           pageHeader: pageData?.pageHeader || FALLBACK.pageHeader,
-          categories: pageData?.categories?.length ? pageData.categories : FALLBACK.categories,
+          categories: Array.isArray(dbProjects) && dbProjects.length > 0
+            ? ["الكل", ...new Set(dbProjects.map((p) => p.category).filter(Boolean))]
+            : (pageData?.categories?.length ? pageData.categories : FALLBACK.categories),
           projects: Array.isArray(dbProjects) && dbProjects.length > 0 ? dbProjects : [],
         });
       } catch {

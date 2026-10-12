@@ -69,6 +69,32 @@ body {
   background: linear-gradient(90deg, transparent, #e8556f 15%, #e8556f 85%, transparent);
   height: 1px;
 }
+.partners-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 1.25rem;
+  padding-right: 1.25rem; /* so 2 copies = exactly 2 × (logos + gaps) */
+  animation: partners-scroll 70s linear infinite;
+  will-change: transform;
+}
+
+@keyframes partners-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } /* was 50% */
+}
+.partners-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 1.25rem;
+  animation: partners-scroll 70s linear infinite;
+}
+.partners-marquee:hover .partners-marquee-track {
+  animation-play-state: paused;
+}
+@keyframes partners-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(50%); }
+}
 .clip-corner {
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
 }

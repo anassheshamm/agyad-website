@@ -1,4 +1,4 @@
-import { IconBillboard, IconVan, IconStorefront, IconPalette, IconPrinter, IconCurtain } from "../components/icons.jsx";
+import { IconBillboard, IconVan, IconStorefront, IconPalette, IconPrinter, IconCurtain, IconGlobe } from "../components/icons.jsx";
 
 export const getIconComponent = (iconName) => {
   const icons = {
@@ -7,7 +7,8 @@ export const getIconComponent = (iconName) => {
     storefront: IconStorefront,
     palette: IconPalette,
     printer: IconPrinter,
-    curtain: IconCurtain
+    curtain: IconCurtain,
+    globe: IconGlobe
   };
   return icons[iconName] || IconStorefront;
 };

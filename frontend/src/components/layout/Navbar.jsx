@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { IconMenu, IconClose } from "../icons.jsx";
-import Logo from "../Logo.jsx";
 import { Link, useLocation } from "react-router-dom";
 
 export const NAV = [
   { id: "home", label: "الرئيسية", path: "/" },
   { id: "about", label: "من نحن", path: "/" },
   { id: "services", label: "خدماتنا", path: "/" },
-  { id: "gallery", label: "معرض الأعمال", path: "/" },
   { id: "projects", label: "أعمالنا", path: "/projects" },
   { id: "contact", label: "تواصل معنا", path: "/" },
 ];
@@ -43,7 +41,7 @@ export default function Navbar() {
             onClick={() => go("home", "/")}
             className="flex items-center gap-2 shrink-0"
           >
-            <Logo tone="light" />
+            <img src="/logo-new.png" alt="باب أجياد" className="w-40 md:w-48 h-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-9">

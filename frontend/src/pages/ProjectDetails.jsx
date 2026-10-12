@@ -84,8 +84,11 @@ export default function ProjectDetail() {
             <span className="mx-3 text-gray-300">/</span>
             <span className="text-gray-900">{project.title}</span>
           </p>
-          <div className="flex gap-3">
-            <button className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-lg hover:border-red-300 hover:text-red-700 hover:bg-gray-50 transition-colors">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link to="/projects" className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-lg hover:border-red-300 hover:text-red-700 hover:bg-gray-50 transition-colors">
+              <IconChevron className="w-4 h-4 rotate-180" /> العودة للمشاريع
+            </Link>
+            <button onClick={() => (navigator.share ? navigator.share({ title: project.title, url: window.location.href }) : navigator.clipboard?.writeText(window.location.href))} className="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-lg hover:border-red-300 hover:text-red-700 hover:bg-gray-50 transition-colors">
               <IconShare className="w-4 h-4" /> مشاركة
             </button>
             <a href="#contact-box" className="inline-flex items-center gap-2 bg-red-700 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-red-800 transition-colors shadow-sm">
@@ -108,9 +111,15 @@ export default function ProjectDetail() {
           <h2 className="text-sm font-semibold text-red-700 mb-1.5 uppercase tracking-wide">
             معرض الوسائط
           </h2>
-          <p className="text-gray-500 text-sm mb-6 max-w-2xl leading-relaxed">
-            {project.videoPlaceholder}
-          </p>
+          {project.videoPlaceholder && (
+            <p className="text-gray-500 text-sm mb-6 max-w-2xl leading-relaxed">
+              {project.videoPlaceholder}
+            </p>
+          )}
+
+          {project.videoUrl && (
+            <video src={project.videoUrl} controls className="w-full rounded-xl mb-6" />
+          )}
 
           {project.images && project.images.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -128,19 +137,23 @@ export default function ProjectDetail() {
           <div className="lg:col-span-8 space-y-8">
             {/* Client Info + Overview */}
             <div className="grid sm:grid-cols-2 gap-6">
-              <section className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+              {clientRows.length > 0 && (
+<section className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
                 <h3 className="text-sm font-semibold text-red-700 mb-4 uppercase tracking-wide">
                   تفاصيل العميل
                 </h3>
                 <InfoTable rows={clientRows} />
               </section>
+)}
 
-              <section className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
+              {overviewRows.length > 0 && (
+<section className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
                 <h3 className="text-sm font-semibold text-red-700 mb-4 uppercase tracking-wide">
                   نظرة عامة
                 </h3>
                 <InfoTable rows={overviewRows} />
               </section>
+)}
             </div>
 
             {/* Story & Overview Text */}
@@ -148,12 +161,16 @@ export default function ProjectDetail() {
               <h3 className="text-sm font-semibold text-red-700 mb-4 uppercase tracking-wide">
                 قصة المشروع
               </h3>
-              <p className="text-gray-600 text-sm leading-loose whitespace-pre-line mb-6">
-                {project.overview}
-              </p>
-              <p className="text-gray-600 text-sm leading-loose whitespace-pre-line">
-                {project.story}
-              </p>
+              {project.overview && (
+                <p className="text-gray-600 text-sm leading-loose whitespace-pre-line mb-6">
+                  {project.overview}
+                </p>
+              )}
+              {project.story && (
+                <p className="text-gray-600 text-sm leading-loose whitespace-pre-line">
+                  {project.story}
+                </p>
+              )}
             </section>
 
             {/* Achievements / Results */}
