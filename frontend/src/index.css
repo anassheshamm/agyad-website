@@ -91,15 +91,17 @@ img, video, canvas, iframe {
   display: flex;
   width: max-content;
   gap: 1.25rem;
-  animation: partners-scroll 70s linear infinite;
+  padding-right: 1.25rem;          /* makes the 2 copies loop seamlessly */
+  animation: partners-scroll 100s linear infinite;
+}
+@keyframes partners-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }   /* was 50% */
 }
 .partners-marquee:hover .partners-marquee-track {
   animation-play-state: paused;
 }
-@keyframes partners-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(50%); }
-}
+
 .clip-corner {
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
 }

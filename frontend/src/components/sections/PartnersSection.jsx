@@ -1,39 +1,51 @@
+import { useState } from "react";
+
+/* Every file must exist in  public/partners/  with EXACTLY this name (case-sensitive).
+   Tip: use simple English names (p1.jpg, p2.png …) — Arabic/space/@ names break easily. */
 const PARTNERS = [
-  "1750739214_2Htj copy.jpg",
-  "1762756851606.jpeg",
-  "7th_(Prince_Sultan)_Armoured_Brigade.svg",
-  "8cb5c5bd-adec-47e2-8cb7-84b02e9d9442.jpg",
-  "9ac8ebfd-ad17-4cad-9c30-b37f54d5e9e2.jpg",
-  "Logo-png.jpg",
-  "Lu7onb17275992281576-Tabuk International Schools.webp",
-  "agd-logo-1 copy.jpg",
-  "image_6.jpg",
-  "images (1).jpeg",
-  "images (2).jpeg",
-  "images.jpeg",
-  "images.png",
-  "labid -logo.jpg",
-  "logo copy.jpg",
-  "logo1 copy.jpg",
-  "logo2 copy.jpg",
+  "p1.svg",
+  "p2.jpg",
+  "p3.jpg",
+  "p4.jpg",
+  "p5.jpeg",
+  "p6.jpg",
+  "p7.jpg",
+  "p8.jpeg",
+  "p9.jpeg",
+  "p10.jpeg",
+  "p11.png",
+  "p12.jpg",
+  "p13.jpg",
+  "p14.jpg",
+  "p15.jpg",
+  "p16.jpg",
+  "p17.webp",
   "pf-logo.jpg",
-  "استكر شفاف اكريلك copy.jpg",
-  "باسقات2 copy.jpg",
+  "p18.jpg",
+  "p19.jpg",
   "تنزيل.png",
   "شعار copy.jpg",
   "شعار المدرسه-01.jpg",
-  "شعار إضافي ملون copy.jpg",
+ "p20.jpg",
   "شعار مدارس اجيال التبوك copy.jpg",
   "ظهر الغلاف copy.jpg",
   "عطاء@4x-8 copy.jpg",
   "كنز العافية لوجو 1 copy.jpg",
   "لوجو واثق المجد 1 copy.jpg",
   "مئاق-اللقيمات---اليوم-الوطني-95-1-copy copy.jpg",
-  "وزارة البيئة والمياه والزراعة copy.jpg",
+  "p21.jpg",
 ];
 
 export default function PartnersSection() {
-  const logos = [...PARTNERS, ...PARTNERS];
+  // files that failed to load are removed instead of leaving empty white cards
+  const [broken, setBroken] = useState([]);
+  const partners = PARTNERS.filter((p) => !broken.includes(p));
+  const logos = [...partners, ...partners];
+
+  const onError = (partner) => {
+    console.warn(`[Partners] image not found: /partners/${partner}`);
+    setBroken((b) => (b.includes(partner) ? b : [...b, partner]));
+  };
 
   return (
     <section id="partners" dir="rtl" lang="ar" className="bg-parchment text-ink py-20 md:py-28">
@@ -51,14 +63,14 @@ export default function PartnersSection() {
               <div
                 key={`${partner}-${index}`}
                 className="flex h-36 w-56 md:h-40 md:w-64 shrink-0 items-center justify-center rounded-xl border border-ink/10 bg-white p-5 shadow-sm"
-                aria-hidden={index >= PARTNERS.length}
+                aria-hidden={index >= partners.length}
               >
                 <img
                   src={encodeURI(`/partners/${partner}`)}
-                  alt={index < PARTNERS.length ? `شريك نجاح ${index + 1}` : ""}
+                  alt={index < partners.length ? `شريك نجاح ${index + 1}` : ""}
                   className="max-h-full max-w-full object-contain"
-                  loading="lazy"
                   draggable="false"
+                  onError={() => onError(partner)}
                 />
               </div>
             ))}
