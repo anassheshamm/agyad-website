@@ -47,23 +47,6 @@ export default function ProjectDetail() {
     loadProject();
   }, [id]);
 
-  const submit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const phone = formData.get("phone");
-    const message = formData.get("message");
-    const whatsappMessage = [
-      `السلام عليكم، أرغب في مناقشة مشروع مشابه لـ «${project.title}».`,
-      `رقم التواصل: ${phone}`,
-      message ? `تفاصيل إضافية: ${message}` : "",
-    ].filter(Boolean).join("\n");
-    window.open(
-      `https://wa.me/966595014299?text=${encodeURIComponent(whatsappMessage)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
-  };
-
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-red-700">جاري التحميل...</div>;
   }
@@ -233,33 +216,16 @@ export default function ProjectDetail() {
               <h3 className="text-2xl font-medium mb-3">هل ترغب في مشروع مشابه؟</h3>
               <p className="text-sm text-red-100 leading-relaxed mb-6">تواصل معنا لمناقشة التفاصيل وبناء نجاحك القادم.</p>
 
-              <form onSubmit={submit} className="space-y-4 relative z-10">
-                <div>
-                  <label className="block text-xs text-red-200 mb-2 font-medium">رقم الهاتف</label>
-                  <input
-                    name="phone"
-                    type="tel"
-                    required
-                    placeholder="05xxxxxxxx"
-                    className="w-full bg-red-800/50 border border-red-600 rounded-lg px-4 py-3 text-sm text-white placeholder:text-red-300 outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-red-200 mb-2 font-medium">تفاصيل المشروع (اختياري)</label>
-                  <textarea
-                    name="message"
-                    rows="3"
-                    placeholder="أخبرنا كيف يمكننا مساعدتك"
-                    className="w-full bg-red-800/50 border border-red-600 rounded-lg px-4 py-3 text-sm text-white placeholder:text-red-300 outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
+              <div className="relative z-10">
+                <a
+                  href={`https://wa.me/966595014299?text=${encodeURIComponent(`السلام عليكم، أرغب في الاستفسار عن تنفيذ مشروع مشابه لـ «${project.title}». هل يمكنكم تزويدي بالتفاصيل؟`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full bg-white text-red-800 py-3.5 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-2"
                 >
                   تواصل عبر واتساب <IconSend className="w-4 h-4 rtl:rotate-180" />
-                </button>
-              </form>
+                </a>
+              </div>
             </section>
 
           </div>
