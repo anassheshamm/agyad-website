@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 import authRoutes from "./modules/auth/auth.routes.js";
 import serviceRoutes from "./modules/services/service.routes.js";
 import galleryRoutes from "./modules/gallery/gallery.routes.js";
@@ -12,15 +13,36 @@ app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(uploadsDirectory, { index: false }));
 
-app.get("/api/health", (_req, res) => res.status(200).json({
-  success: true,
-  message: "Bab Ajyad API is running",
-}));
+const databaseConnected = () => mongoose.connection.readyState === 1;
 
-app.use("/api/auth", authRoutes);
-app.use("/api/services", serviceRoutes);
-app.use("/api/gallery", galleryRoutes);
-app.use("/api/projects", projectRoutes);
+app.get("/api/health", (_req, res) => {
+  const readyState = mongoose.connection.readyState;
+  const connected = readyState === 1;
+  const databaseStatus = ["disconnected", "connected", "connecting", "disconnecting"][readyState] || "unknown";
+  return res.status(connected ? 200 : 503).json({
+    success: connected,
+    server: "running",
+    database: {
+      connected,
+      status: databaseStatus,
+    },
+  });
+});
+
+const requireDatabase = (_req, res, next) => {
+  if (!databaseConnected()) {
+    return res.status(503).json({
+      success: false,
+      message: "Database unavailable",
+    });
+  }
+  return next();
+};
+
+app.use("/api/auth", requireDatabase, authRoutes);
+app.use("/api/services", requireDatabase, serviceRoutes);
+app.use("/api/gallery", requireDatabase, galleryRoutes);
+app.use("/api/projects", requireDatabase, projectRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/contact", contactRoutes);
 
