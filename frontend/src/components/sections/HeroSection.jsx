@@ -166,12 +166,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 pointer-events-none opacity-[.13] mix-blend-overlay" style={{ backgroundImage: NOISE }} />
 
       {/* faint logo behind the text on small screens */}
-      <img
-        src="/logo-mark-grey.svg"
-        alt=""
-        aria-hidden="true"
-        className="hidden md:block absolute -left-16 top-24 w-72 opacity-[.12] pointer-events-none"
-      />
+      
 
       {/* ---------- content ---------- */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-10 pt-32 pb-40">
@@ -305,7 +300,7 @@ export default function HeroSection() {
 
                   <div className="relative aspect-square overflow-hidden bg-charcoal">
                   <img
-                      src={POLAROID_PHOTO}
+                      src="/download1.png"
                       alt="من أعمال باب أجياد"
                       className="absolute inset-0 w-full h-full object-cover saturate-[1.1] contrast-[1.05]"
                     />

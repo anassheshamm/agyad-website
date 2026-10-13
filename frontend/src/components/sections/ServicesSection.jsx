@@ -35,7 +35,7 @@ export default function ServicesSection() {
                     className="absolute inset-0 -z-20 w-full h-full object-cover scale-110 blur-[3px] transition duration-700 group-hover:blur-[1.5px] group-hover:scale-125"
                   />
                   {/* dark wash so the text stays readable */}
-                  <div className="absolute inset-0 -z-10 bg-black/60" />
+                  <div className="absolute inset-0 -z-10 bg-black/40" />
 
                   <span className="absolute top-3 left-4 font-serif text-3xl text-parchment/20">{toArabic(i + 1)}</span>
 
