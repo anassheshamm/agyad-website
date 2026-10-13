@@ -58,9 +58,6 @@ export default function AdminProjects() {
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-4 flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-xl font-bold text-red-700">لوحة الإدارة</h1>
           <nav className="flex flex-wrap items-center gap-3">
-            <Link to="/admin/services" className="text-sm font-medium text-gray-700 border border-gray-200 px-5 py-2.5 rounded-lg hover:border-red-300 hover:text-red-700 transition-colors">
-              إدارة الخدمات
-            </Link>
             <Link to="/admin/projects/new" className="text-sm font-medium bg-red-700 text-white px-5 py-2.5 rounded-lg hover:bg-red-800 transition-colors shadow-sm">
               + مشروع جديد
             </Link>

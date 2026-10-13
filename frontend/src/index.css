@@ -41,6 +41,8 @@
 html {
   scroll-padding-top: 96px;
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden; /* fallback for older browsers */
 }
 * {
   box-sizing: border-box;
@@ -49,6 +51,17 @@ body {
   background: #4a0b1a;
   margin: 0;
   font-family: "Tajawal", sans-serif;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;        /* no sideways scroll; unlike "hidden" it keeps sticky headers working */
+  overflow-wrap: break-word; /* long words/links wrap instead of pushing the page wider */
+}
+#root {
+  max-width: 100%;
+  overflow-x: clip;
+}
+img, video, canvas, iframe {
+  max-width: 100%;
 }
 .font-serif {
   font-family: "Amiri", serif;
@@ -69,18 +82,10 @@ body {
   background: linear-gradient(90deg, transparent, #e8556f 15%, #e8556f 85%, transparent);
   height: 1px;
 }
-.partners-marquee-track {
-  display: flex;
-  width: max-content;
-  gap: 1.25rem;
-  padding-right: 1.25rem; /* so 2 copies = exactly 2 × (logos + gaps) */
-  animation: partners-scroll 70s linear infinite;
-  will-change: transform;
-}
-
-@keyframes partners-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); } /* was 50% */
+.partners-marquee {
+  overflow: hidden;
+  direction: ltr;
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 .partners-marquee-track {
   display: flex;

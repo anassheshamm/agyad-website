@@ -1,6 +1,6 @@
 import React from "react";
 import { NAV } from "../../data/nav.js";
-import Logo from "../Logo.jsx";
+import Logo from "/logo-new.png";
 
 import {
   FaFacebookF,
@@ -50,7 +50,11 @@ export default function Footer() {
     <footer className="bg-ink border-t border-ink-line py-14">
       <div className="max-w-7xl mx-auto px-6 md:px-10">
         <div className="flex flex-col items-center gap-8">
-          <Logo tone="light" />
+          <img
+            src={Logo}
+            alt="باب أجياد للدعاية والإعلان"
+            className="h-12 w-auto"
+          />
 
           <nav className="flex flex-wrap gap-7 justify-center">
             {NAV.map((n) => (

@@ -41,7 +41,7 @@ const NOISE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 /* Floating "sticker" chip used around the logo card */
-function Chip({ pos, rotate, delay, tone, children }) {
+function Chip({ pos, rotate, delay, tone, sm, children }) {
   const tones = {
     light: "bg-parchment text-oxblood shadow-[0_12px_30px_-8px_rgba(0,0,0,.5)]",
     glass: "bg-white/10 text-parchment border border-white/25 backdrop-blur-md",
@@ -53,12 +53,61 @@ function Chip({ pos, rotate, delay, tone, children }) {
       style={{ transform: "translate3d(calc(var(--px) * 1.8), calc(var(--py) * 1.8), 0)" }}
     >
       <div
-        className={`hx-float rounded-full px-5 py-2.5 text-sm font-bold whitespace-nowrap ${tones[tone]}`}
+        className={`hx-float rounded-full font-bold whitespace-nowrap ${sm ? "px-3.5 py-1.5 text-xs" : "px-5 py-2.5 text-sm"} ${tones[tone]}`}
         style={{ "--r": rotate, animationDelay: delay }}
       >
         {children}
       </div>
     </div>
+  );
+}
+
+/* Polaroid stack — used twice: under the tagline on phones, in the side scene on desktop */
+function Polaroids({ className = "w-[310px]" }) {
+  return (
+        <div className={`hx-float relative ${className}`} style={{ "--r": "0deg", animationDuration: "7s" }}>
+          {/* back polaroid: brand card */}
+          <div className="absolute inset-0 translate-x-8 translate-y-5 md:translate-x-12 md:translate-y-7 rotate-[8deg] bg-[#f4f2ef] p-3.5 pb-0 shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)]">
+            <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-oxblood-soft via-oxblood to-oxblood-deep">
+              <div className="absolute top-0 left-0 w-20 h-20 bg-silver/60" style={{ clipPath: "polygon(0 0,100% 0,0 100%)" }} />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,.2),transparent_60%)]" />
+              <img
+                src="/logo-new.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 m-auto w-[84%] drop-shadow-[0_10px_18px_rgba(0,0,0,.4)]"
+              />
+            </div>
+          </div>
+  
+          {/* front polaroid: photo */}
+          <div className="relative -rotate-[4deg] bg-[#fbfaf8] p-3.5 pb-0 shadow-[0_34px_70px_-20px_rgba(0,0,0,.8)] transition-transform duration-500 hover:-rotate-1 hover:scale-[1.02]">
+            {/* tape */}
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 rotate-[3deg] w-24 h-7 bg-silver-light/80 shadow-sm z-10" style={{ clipPath: "polygon(4% 0,96% 0,100% 20%,96% 40%,100% 60%,96% 80%,100% 100%,0 100%,4% 80%,0 60%,4% 40%,0 20%)" }} />
+  
+            <div className="relative aspect-square overflow-hidden bg-charcoal">
+              <img
+                src="/download1.png"
+                alt="من أعمال باب أجياد"
+                className="absolute inset-0 w-full h-full object-cover saturate-[1.1] contrast-[1.05]"
+              />
+              {/* instant-film look */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-gild/25 via-transparent to-white/10 mix-blend-soft-light" />
+              <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,.45)]" />
+              <img
+                src="/download1.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute bottom-3 right-3 w-11 opacity-90 brightness-150 drop-shadow"
+              />
+            </div>
+  
+            <div className="h-[76px] md:h-[92px] flex flex-col items-center justify-center text-center">
+              <p className="font-serif font-bold text-[1.4rem] md:text-[1.7rem] leading-none text-oxblood">بوابتك للإبداع</p>
+              <p className="text-[11px] text-silver mt-2 tracking-wide">باب أجياد ✦ تبوك</p>
+            </div>
+          </div>
+        </div>
   );
 }
 
@@ -90,10 +139,11 @@ export default function HeroSection() {
       id="home"
       ref={ref}
       onMouseMove={onMove}
+      onTouchMove={(e) => onMove(e.touches[0])}
       dir="rtl"
       lang="ar"
       style={{ "--mx": "30%", "--my": "35%", "--px": "0px", "--py": "0px" }}
-      className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden bg-ink"
+      className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden overflow-x-clip bg-ink"
     >
       <style>{CSS}</style>
 
@@ -128,7 +178,7 @@ export default function HeroSection() {
       <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-10 pt-32 pb-40">
         <div className="grid md:grid-cols-12 gap-10 items-center">
           {/* text (right side in RTL) */}
-          <div className="md:col-span-7 text-right">
+          <div className="md:col-span-7 text-center md:text-right">
             <div
               className="hx-up inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/[.07] backdrop-blur-md pl-5 pr-4 py-2 mb-8"
               style={up(50)}
@@ -176,11 +226,27 @@ export default function HeroSection() {
               </svg>
             </div>
 
-            <p className="hx-up text-stone/90 text-base md:text-lg leading-8 max-w-xl mt-8" style={up(450)}>
+            {/* polaroid on phones: between the tagline and the description */}
+            <div className="hx-up md:hidden flex justify-center mt-12 mb-6 pr-6" style={up(380)}>
+              <div className="relative w-[250px]">
+                {/* soft glow so the card lifts off the dark background */}
+                <div className="absolute inset-6 rounded-full bg-gild/30 blur-[40px]" aria-hidden="true" />
+                <div
+                  className="relative transition-transform duration-300 ease-out"
+                  style={{ transform: "translate3d(var(--px), var(--py), 0)" }}
+                >
+                  <Polaroids className="w-full" />
+                </div>
+                <Chip sm pos="-top-5 right-0" rotate="-7deg" delay="0s" tone="light">تصميم ✦</Chip>
+                <Chip sm pos="bottom-12 left-0" rotate="6deg" delay="-2s" tone="red">حروف بارزة</Chip>
+              </div>
+            </div>
+
+            <p className="hx-up text-stone/90 text-base md:text-lg leading-8 max-w-xl mx-auto md:mx-0 mt-8" style={up(450)}>
               {INTRO.lead}
             </p>
 
-            <div className="hx-up flex flex-wrap gap-4 mt-10 justify-start" style={up(600)}>
+            <div className="hx-up flex flex-wrap gap-4 mt-10 justify-center md:justify-start" style={up(600)}>
               <a
                 href="#services"
                 onClick={scrollTo("services")}
@@ -198,7 +264,7 @@ export default function HeroSection() {
               </a>
             </div>
 
-            <ul className="hx-up flex flex-wrap gap-2.5 mt-10" style={up(750)}>
+            <ul className="hx-up flex flex-wrap gap-2.5 mt-10 justify-center md:justify-start" style={up(750)}>
               {VALUES.map((v) => (
                 <li
                   key={v.title}
@@ -218,49 +284,7 @@ export default function HeroSection() {
               className="absolute inset-x-0 top-14 flex justify-center transition-transform duration-300 ease-out"
               style={{ transform: "translate3d(var(--px), var(--py), 0)" }}
             >
-              <div className="hx-float relative w-[310px]" style={{ "--r": "0deg", animationDuration: "7s" }}>
-                {/* back polaroid: brand card */}
-                <div className="absolute inset-0 translate-x-12 translate-y-7 rotate-[8deg] bg-[#f4f2ef] p-3.5 pb-0 shadow-[0_24px_50px_-20px_rgba(0,0,0,.7)]">
-                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-oxblood-soft via-oxblood to-oxblood-deep">
-                    <div className="absolute top-0 left-0 w-20 h-20 bg-silver/60" style={{ clipPath: "polygon(0 0,100% 0,0 100%)" }} />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,.2),transparent_60%)]" />
-                    <img
-                      src="/logo-new.png"
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 m-auto w-[84%] drop-shadow-[0_10px_18px_rgba(0,0,0,.4)]"
-                    />
-                  </div>
-                </div>
-
-                {/* front polaroid: photo */}
-                <div className="relative -rotate-[4deg] bg-[#fbfaf8] p-3.5 pb-0 shadow-[0_34px_70px_-20px_rgba(0,0,0,.8)] transition-transform duration-500 hover:-rotate-1 hover:scale-[1.02]">
-                  {/* tape */}
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 rotate-[3deg] w-24 h-7 bg-silver-light/80 shadow-sm z-10" style={{ clipPath: "polygon(4% 0,96% 0,100% 20%,96% 40%,100% 60%,96% 80%,100% 100%,0 100%,4% 80%,0 60%,4% 40%,0 20%)" }} />
-
-                  <div className="relative aspect-square overflow-hidden bg-charcoal">
-                    <img
-                      src="/download1.png"
-                      alt="من أعمال باب أجياد"
-                      className="absolute inset-0 w-full h-full object-cover saturate-[1.1] contrast-[1.05]"
-                    />
-                    {/* instant-film look */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-gild/25 via-transparent to-white/10 mix-blend-soft-light" />
-                    <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,.45)]" />
-                    <img
-                      src="/download1.png"
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute bottom-3 right-3 w-11 opacity-90 brightness-150 drop-shadow"
-                    />
-                  </div>
-
-                  <div className="h-[92px] flex flex-col items-center justify-center text-center">
-                    <p className="font-serif font-bold text-[1.7rem] leading-none text-oxblood">بوابتك للإبداع</p>
-                    <p className="text-[11px] text-silver mt-2 tracking-wide">باب أجياد ✦ تبوك</p>
-                  </div>
-                </div>
-              </div>
+              <Polaroids className="w-[310px]" />
             </div>
 
             {/* stickers */}

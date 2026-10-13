@@ -7,7 +7,6 @@ import AdminProjectForm from "./pages/admin/AdminProjectForm";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminProjects from "./pages/admin/AdminProjects";
 import FloatingCallButton from "./components/FloatingCallButton";
-import AdminServices from "./pages/admin/AdminServices";
 
 
 const ProtectedRoute = ({ children }) => {
@@ -30,7 +29,6 @@ export default function App() {
         <Route path="/admin/projects" element={
           <ProtectedRoute><AdminProjects /></ProtectedRoute>
         } />
-        <Route path="/admin/services" element={<ProtectedRoute><AdminServices /></ProtectedRoute>} />
         <Route path="/admin/projects/new" element={
   <ProtectedRoute><AdminProjectForm /></ProtectedRoute>
 } />

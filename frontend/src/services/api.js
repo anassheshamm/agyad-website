@@ -36,51 +36,6 @@ export const fetchProjects = async (featuredOnly = false) => {
   }
 };
 
-export const fetchServices = async (includeInactive = false) => {
-  try {
-    const path = includeInactive ? "/services/admin/all" : "/services";
-    const res = await fetch(`${API_URL}${path}`, {
-      headers: includeInactive ? getAuthHeaders() : undefined,
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.data || [];
-  } catch (error) {
-    console.error("Failed to load services:", error);
-    return null;
-  }
-};
-
-export const createService = async (data) => {
-  try {
-    const res = await fetch(`${API_URL}/services`, { method: "POST", headers: getAuthHeaders(), body: JSON.stringify(data) });
-    return await res.json();
-  } catch (error) {
-    console.error("Error creating service:", error);
-    return { success: false, message: "فشل الاتصال بالخادم" };
-  }
-};
-
-export const updateService = async (id, data) => {
-  try {
-    const res = await fetch(`${API_URL}/services/${id}`, { method: "PUT", headers: getAuthHeaders(), body: JSON.stringify(data) });
-    return await res.json();
-  } catch (error) {
-    console.error("Error updating service:", error);
-    return { success: false, message: "فشل الاتصال بالخادم" };
-  }
-};
-
-export const deleteService = async (id) => {
-  try {
-    const res = await fetch(`${API_URL}/services/${id}`, { method: "DELETE", headers: getAuthHeaders() });
-    return await res.json();
-  } catch (error) {
-    console.error("Error deleting service:", error);
-    return { success: false, message: "فشل الاتصال بالخادم" };
-  }
-};
-
 export const fetchProjectById = async (id) => {
   try {
     const res = await fetch(`${API_URL}/projects/${id}`);

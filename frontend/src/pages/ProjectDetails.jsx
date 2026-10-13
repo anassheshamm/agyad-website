@@ -37,7 +37,6 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     const loadProject = async () => {
@@ -50,7 +49,19 @@ export default function ProjectDetail() {
 
   const submit = (e) => {
     e.preventDefault();
-    setSent(true);
+    const formData = new FormData(e.currentTarget);
+    const phone = formData.get("phone");
+    const message = formData.get("message");
+    const whatsappMessage = [
+      `السلام عليكم، أرغب في مناقشة مشروع مشابه لـ «${project.title}».`,
+      `رقم التواصل: ${phone}`,
+      message ? `تفاصيل إضافية: ${message}` : "",
+    ].filter(Boolean).join("\n");
+    window.open(
+      `https://wa.me/966595014299?text=${encodeURIComponent(whatsappMessage)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
 
   if (loading) {
@@ -223,16 +234,21 @@ export default function ProjectDetail() {
 
               <form onSubmit={submit} className="space-y-4 relative z-10">
                 <div>
-                  <label className="block text-xs text-red-200 mb-2 font-medium">البريد الإلكتروني</label>
+                  <label className="block text-xs text-red-200 mb-2 font-medium">رقم الهاتف</label>
                   <input
-                    type="email"
+                    name="phone"
+                    type="tel"
+                    required
+                    placeholder="05xxxxxxxx"
                     className="w-full bg-red-800/50 border border-red-600 rounded-lg px-4 py-3 text-sm text-white placeholder:text-red-300 outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-red-200 mb-2 font-medium">الهاتف</label>
-                  <input
-                    type="text"
+                  <label className="block text-xs text-red-200 mb-2 font-medium">تفاصيل المشروع (اختياري)</label>
+                  <textarea
+                    name="message"
+                    rows="3"
+                    placeholder="أخبرنا كيف يمكننا مساعدتك"
                     className="w-full bg-red-800/50 border border-red-600 rounded-lg px-4 py-3 text-sm text-white placeholder:text-red-300 outline-none focus:border-white focus:ring-1 focus:ring-white transition-all"
                   />
                 </div>
@@ -240,11 +256,7 @@ export default function ProjectDetail() {
                   type="submit"
                   className="w-full bg-white text-red-800 py-3.5 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mt-2"
                 >
-                  {sent ? "تم الإرسال بنجاح" : (
-                    <>
-                      إرسال <IconSend className="w-4 h-4 rtl:rotate-180" />
-                    </>
-                  )}
+                  تواصل عبر واتساب <IconSend className="w-4 h-4 rtl:rotate-180" />
                 </button>
               </form>
             </section>
