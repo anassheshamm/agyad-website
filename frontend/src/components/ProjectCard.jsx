@@ -1,7 +1,8 @@
-import React from "react";
+import { createElement } from "react";
 import { Link } from "react-router-dom";
 import { IconArrow } from "./icons.jsx";
 import { getIconComponent } from "../utils/iconMap.jsx";
+import { resolveImageUrl } from "../services/api.js";
 
 const TILE_BG = [
   "from-[#9B0028] via-[#7A001F] to-[#3C3C3C]",
@@ -23,9 +24,10 @@ export default function ProjectCard({ project, index }) {
       <Link to={detailHref} className="relative h-56 overflow-hidden block">
         {displayImage ? (
           <img
-            src={displayImage}
+            src={resolveImageUrl(displayImage)}
             alt={project.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
         ) : (
           <div className={"absolute inset-0 bg-gradient-to-br " + TILE_BG[index % TILE_BG.length]}>
@@ -34,7 +36,7 @@ export default function ProjectCard({ project, index }) {
             <div className="absolute bottom-0 right-0 w-28 h-28 bg-white/10 rotate-45 translate-x-12 translate-y-12" />
             
             <div className="absolute inset-0 flex items-center justify-center">
-              <ProjectIcon className="w-14 h-14 text-white transition-transform duration-500 group-hover:scale-110" />
+              {createElement(ProjectIcon, { className: "w-14 h-14 text-white transition-transform duration-500 group-hover:scale-110" })}
             </div>
           </div>
         )}

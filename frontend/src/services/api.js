@@ -1,5 +1,12 @@
 // Set VITE_API_URL in your production build env, e.g. https://api.yourdomain.com/api
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:9000/api";
+const API_ORIGIN = new URL(API_URL, window.location.origin).origin;
+
+export const resolveImageUrl = (url) => {
+  if (typeof url !== "string" || !url) return "";
+  if (url.startsWith("/uploads/")) return `${API_ORIGIN}${url}`;
+  return url;
+};
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("adminToken");
@@ -73,6 +80,25 @@ export const updateProject = async (id, projectData) => {
   } catch (error) {
     console.error("Error updating project:", error);
     return { success: false, message: "فشل الاتصال بالخادم" };
+  }
+};
+
+export const uploadProjectImages = async (files) => {
+  try {
+    const body = new FormData();
+    files.forEach((file) => body.append("images", file));
+    const token = localStorage.getItem("adminToken");
+    const res = await fetch(`${API_URL}/uploads`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body,
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) return { success: false, message: json.message || "Image upload failed" };
+    return { ...json, data: { ...json.data, images: json.data.images.map(({ url }) => resolveImageUrl(url)) } };
+  } catch (error) {
+    console.error("Error uploading project images:", error);
+    return { success: false, message: "فشل الاتصال بالخادم أثناء رفع الصور" };
   }
 };
 

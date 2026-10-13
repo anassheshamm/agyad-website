@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchProjects, deleteProject } from "../../services/api";
+import { fetchProjects, deleteProject, resolveImageUrl } from "../../services/api";
 
 export default function AdminProjects() {
   const [projects, setProjects] = useState([]);
@@ -115,8 +115,8 @@ export default function AdminProjects() {
             {shown.map((p) => (
               <article key={p._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm flex flex-col">
                 <Link to={`/admin/projects/edit/${p._id}`} className="block aspect-[16/10] bg-gray-100 relative">
-                  {p.images?.[0] ? (
-                    <img src={p.images[0]} alt="" className="w-full h-full object-cover" />
+                  {(p.coverImage || p.images?.[0]) ? (
+                    <img src={resolveImageUrl(p.coverImage || p.images[0])} alt="" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                   ) : (
                     <span className="absolute inset-0 flex items-center justify-center text-xs text-gray-400">بدون صورة</span>
                   )}
