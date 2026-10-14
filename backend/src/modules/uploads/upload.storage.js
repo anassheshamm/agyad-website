@@ -5,9 +5,13 @@ import { fileURLToPath } from "node:url";
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultDirectory = path.resolve(moduleDirectory, "../../../uploads");
 
-// On Hostinger, set UPLOAD_DIR to a folder OUTSIDE the deployed project
 export const uploadsDirectory = process.env.UPLOAD_DIR
   ? path.resolve(process.env.UPLOAD_DIR)
   : defaultDirectory;
 
-export const ensureUploadsDirectory = () => mkdir(uploadsDirectory, { recursive: true });
+export const thumbsDirectory = path.join(uploadsDirectory, "thumbs");
+
+export const ensureUploadsDirectory = async () => {
+  await mkdir(uploadsDirectory, { recursive: true });
+  await mkdir(thumbsDirectory, { recursive: true });
+};
