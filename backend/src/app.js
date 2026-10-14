@@ -11,7 +11,8 @@ import { uploadsDirectory } from "./modules/uploads/upload.storage.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(uploadsDirectory, { index: false }));
+// app.use("/uploads", express.static(uploadsDirectory, { index: false }));
+app.use("/uploads", express.static(uploadsDirectory, { index: false, maxAge: "30d", immutable: true }));
 
 const databaseConnected = () => mongoose.connection.readyState === 1;
 
