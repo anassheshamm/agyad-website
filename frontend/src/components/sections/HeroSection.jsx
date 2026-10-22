@@ -86,7 +86,7 @@ function Polaroids({ className = "w-[310px]" }) {
   
             <div className="relative aspect-square overflow-hidden bg-charcoal">
               <img
-                src="/download1.png"
+                src="/hero-printing.jpg"
                 alt="من أعمال باب أجياد"
                 className="absolute inset-0 w-full h-full object-cover saturate-[1.1] contrast-[1.05]"
               />
@@ -94,7 +94,7 @@ function Polaroids({ className = "w-[310px]" }) {
               <div className="absolute inset-0 bg-gradient-to-tr from-gild/25 via-transparent to-white/10 mix-blend-soft-light" />
               <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,.45)]" />
               <img
-                src="/download1.png"
+                src="hero-printing.jpg"
                 alt=""
                 aria-hidden="true"
                 className="absolute bottom-3 right-3 w-11 opacity-90 brightness-150 drop-shadow"
@@ -300,7 +300,7 @@ export default function HeroSection() {
 
                   <div className="relative aspect-square overflow-hidden bg-charcoal">
                   <img
-                      src="/download1.png"
+                      src="/hero-printing.jpg"
                       alt="من أعمال باب أجياد"
                       className="absolute inset-0 w-full h-full object-cover saturate-[1.1] contrast-[1.05]"
                     />
