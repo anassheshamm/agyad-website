@@ -1,3 +1,4 @@
+
 import React from "react";
 import { IconEye, IconTarget, IconCheck } from "../icons.jsx";
 import { INTRO, VISION, MISSION, VALUES, VALUES_INTRO, GOALS } from "../../data/about.js";
@@ -12,12 +13,22 @@ export default function AboutSection() {
     <div dir="rtl" lang="ar">
       <section id="about" className="relative bg-parchment text-charcoal py-24 md:py-32 overflow-hidden">
         
+        <div className="relative max-w-7xl mx-auto px-6 md:px-10 grid md:grid-cols-12 gap-10 md:gap-14 items-start">
+          {/* صورة من نحن */}
+          <div className="md:col-span-6">
+            <img
+              src="/images/projects/about-uss.jpeg"
+              alt="فريق باب أجياد أثناء العمل"
+              className="w-full h-auto md:h-[440px] object-cover rounded-[2rem]"
+            />
+          </div>
 
-        <div className="relative max-w-7xl mx-auto px-6 md:px-10 grid md:grid-cols-12 gap-14">
-          {/* مقدمة (من نحن) */}
-          <div className="md:col-span-5">
+          {/* مقدمة من نحن */}
+          <div className="md:col-span-6">
             <p className="text-oxblood text-sm mb-3">{INTRO.eyebrow}</p>
-            <h2 className="font-serif font-bold text-4xl md:text-5xl leading-tight text-oxblood">من نحن</h2>
+            <h2 className="font-serif font-bold text-4xl md:text-5xl leading-tight text-oxblood">
+              من نحن
+            </h2>
             <div className="hairline w-24 my-7" />
             <p className="text-charcoal font-medium leading-8 mb-5">{INTRO.lead}</p>
             {INTRO.paragraphs.map((t, i) => (
@@ -26,7 +37,7 @@ export default function AboutSection() {
           </div>
 
           {/* الرؤية والرسالة */}
-          <div className="md:col-span-7">
+          <div className="md:col-span-12">
             <div className="border-t border-charcoal/15">
               {POINTS.map((pt, i) => (
                 <div key={i} className="flex items-start gap-6 py-7 border-b border-charcoal/15">
